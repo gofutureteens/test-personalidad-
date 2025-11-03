@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Test de Personalidad y Vocación</title>
+<style>
+body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f9; }
+h1, h2 { color: #333; }
+.question { margin: 15px 0; }
+button { padding: 10px 20px; background-color: #4CAF50; color: white; border: none; cursor: pointer; margin-right:10px; }
+button:hover { background-color: #45a049; }
+.result { margin-top: 20px; padding: 15px; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+</style>
+</head>
+<body>
+<h1>Test de Personalidad y Vocación</h1>
+<p>Responde honestamente para descubrir tu estilo de personalidad, tus fortalezas y las carreras que más se ajustan a ti.</p>
+<form id="personalityForm">
+<div id="questions"></div>
+<button type="button" onclick="calculateResults()">Ver resultados</button>
+<button type="button" onclick="resetForm()">Reiniciar test</button>
+</form>
+<div id="results" class="result" style="display:none;"></div>
+<script>
+const categories = {/* todas las categorías y preguntas */};
+const careers = {/* todas las carreras, mensajes y consejos */};
+
+let qIndex = 0; // contador global
+
+function loadQuestions() {
+    const container = document.getElementById('questions');
+    container.innerHTML = ''; // Limpiar antes de cargar
+    qIndex = 0; // reiniciar contador
+    for (let cat in categories) {
+        container.innerHTML += `<h2>${cat}</h2>`;
+        categories[cat].questions.forEach(q => {
+            container.innerHTML += `
+            <div class='question'>
+                <label>${q}</label><br>
+                <input type='radio' name='q${qIndex}' value='1'> 1 - Totalmente en desacuerdo<br>
+                <input type='radio' name='q${qIndex}' value='2'> 2 - En desacuerdo<br>
+                <input type='radio' name='q${qIndex}' value='3'> 3 - Ni de acuerdo ni en desacuerdo<br>
+                <input type='radio' name='q${qIndex}' value='4'> 4 - De acuerdo<br>
+                <input type='radio' name='q${qIndex}' value='5'> 5 - Totalmente de acuerdo
+            </div>
+            `;
+            qIndex++;
+        });
+    }
+}
+
+function calculateResults() {
+    let qIndexCalc = 0;
+    for (let cat in categories) {
+        categories[cat].score = 0;
+        categories[cat].questions.forEach(_ => {
+            const selected = document.querySelector(`input[name='q${qIndexCalc}']:checked`);
+            const val = selected ? parseInt(selected.value) : 0;
+            categories[cat].score += val;
+            qIndexCalc++;
+        });
+    }
+    let maxCat = Object.keys(categories)[0];
+    for (let cat in categories) {
+        if (categories[cat].score > categories[maxCat].score) maxCat = cat;
+    }
+    displayResult(maxCat);
+}
+
+function displayResult(cat) {
+    const resDiv = document.getElementById('results');
+    let html = `<h2>Tu tipo de personalidad: ${cat}</h2>`;
+    html += `<p>${careers[cat].message}</p>`;
+    html += `<p><strong>Consejo para tu futuro:</strong> ${careers[cat].advice}</p><ul>`;
+    careers[cat].list.forEach(c => {
+        html += `<li><a href='${c.link}' target='_blank'>${c.name}</a></li>`;
+    });
+    html += '</ul>';
+    resDiv.innerHTML = html;
+    resDiv.style.display = 'block';
+    window.scrollTo(0, document.body.scrollHeight);
+}
+
+function resetForm() {
+    for (let cat in categories) {
+        categories[cat].score = 0; // Resetear puntajes
+    }
+    document.getElementById('results').style.display = 'none'; // Ocultar resultados
+    loadQuestions(); // Recargar preguntas
+}
+
+loadQuestions();
+</script>
+</body>
+</html>
